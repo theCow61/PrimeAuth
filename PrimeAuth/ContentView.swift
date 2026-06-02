@@ -18,15 +18,14 @@ struct ContentView: View {
     @State private var newProfileName: String = ""
     @StateObject private var scrnshotQrer = ScreenshotQR()
     
+    @State private var profileViewWidth: CGFloat = 1000
+    
     var body: some View {
         
         VStack {
             
             ScrollView {
                 VStack {
-                    if profiles.isEmpty {
-                        Color.clear.frame(width: 10, height: 10) // so its not empty after deleting the last profile. Avoids an exception
-                    }
                     ForEach(profiles) { profile in
                         HStack{
                             //Label(profile.name, systemImage: profile.isSelected ? "checkmark.app" : "")
@@ -65,13 +64,18 @@ struct ContentView: View {
                             }
                         }
                     }
-                }
-            }.scrollIndicators(.never)
+                }.background(
+                    GeometryReader { geometry -> Color in
+                        DispatchQueue.main.async {
+                            profileViewWidth = geometry.size.width
+                        }
+                        return Color.clear
+                    }
+                )
+            }.scrollIndicators(.never).frame(maxWidth: profileViewWidth + 10) // would prefer not to have this maxWidth maxHeight, but there is a wierd bug that has started occuring without constraining height (maybe I updated the OS). + 10 for room for a quick grow. (Otherwise it might end up forcing the VStack to squize some of the text and making it such that the profileViewWidth doesn't actually change)
+            // issue though is that it's occupying all of the maxWidth. Let's set the maxWidth dynamically to the width the VStack is actually using to get around this
+            // https://medium.com/@sama3l/how-to-resize-scrollview-to-fit-contents-in-swiftui-35f59b582a33
             
-            /*Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")*/
             if !showNewProfileView {
                 Button("New Profile") {
                     showNewProfileView = true
