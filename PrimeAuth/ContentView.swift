@@ -84,8 +84,8 @@ struct ContentView: View {
             if showNewProfileView {
                 TextField(text: $newProfileName, prompt: Text("New Profile Name")) {}
                 HStack {
-                    SecureField(text: $scrnshotQrer.qrString, prompt: Text("Base32 Encoded Key")) {}
-                    Button("Scan", systemImage: "qrcode.viewfinder", action: {
+                    SecureField(text: $scrnshotQrer.qrString, prompt: Text("Secret key if no QR")) {}
+                    Button("QR Scan", systemImage: "qrcode.viewfinder", action: {
                         let picker = SCContentSharingPicker.shared
                         picker.add(scrnshotQrer)
                         picker.isActive = true
@@ -132,6 +132,11 @@ class ScreenshotQR: NSObject, SCContentSharingPickerObserver, ObservableObject {
         let conf = SCStreamConfiguration()
         conf.showsCursor = false
         picker.isActive = false
+        
+        // use the dimensions from what was picked except upscaled incase QR code features aren't thick enough
+        conf.width = Int(didUpdateWith.contentRect.width) * 2
+        conf.height = Int(didUpdateWith.contentRect.height) * 2
+
         /*DispatchQueue.main.async {
             self.qrString = "asdfasdfsf"
             debugPrint("asdfasdfasdfasdflkjdsflk;asdjf;aldskjf;l")
