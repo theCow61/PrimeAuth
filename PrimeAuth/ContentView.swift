@@ -72,7 +72,9 @@ struct ContentView: View {
                         return Color.clear
                     }
                 )
-            }.scrollIndicators(.never).frame(maxWidth: profileViewWidth + 10) // would prefer not to have this maxWidth maxHeight, but there is a wierd bug that has started occuring without constraining height (maybe I updated the OS). + 10 for room for a quick grow. (Otherwise it might end up forcing the VStack to squize some of the text and making it such that the profileViewWidth doesn't actually change)
+            }.scrollIndicators(.never).frame(maxWidth: .infinity) // inconsistent sizing seems to occur with the dynamic solution used below. Will just fix the width for now
+            
+            //.scrollIndicators(.never).frame(maxWidth: profileViewWidth + 10) // would prefer not to have this maxWidth maxHeight, but there is a wierd bug that has started occuring without constraining height (maybe I updated the OS). + 10 for room for a quick grow. (Otherwise it might end up forcing the VStack to squize some of the text and making it such that the profileViewWidth doesn't actually change)
             // issue though is that it's occupying all of the maxWidth. Let's set the maxWidth dynamically to the width the VStack is actually using to get around this
             // https://medium.com/@sama3l/how-to-resize-scrollview-to-fit-contents-in-swiftui-35f59b582a33
             
