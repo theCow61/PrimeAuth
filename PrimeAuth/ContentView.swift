@@ -21,51 +21,66 @@ struct ContentView: View {
     var body: some View {
         
         VStack {
-            ForEach(profiles) { profile in
-                HStack{
-                    //Label(profile.name, systemImage: profile.isSelected ? "checkmark.app" : "")
-                    Button {
-                        let code = profile.get2Auth6DigitCode()
-                        NSPasteboard.general.clearContents()
-                        NSPasteboard.general.setString(code ?? "", forType: .string)
-                        // put recenently used profile at the top while normalizing accessCounts so usage details aren't stored on disk except that a profile may be used more than another profile
-                        // we don't want it so that "the person accessed this x amount of times and that y amount of times" is aparent on the db
-                        var i = 0
-                        for prof in profiles.reversed() {
-                            if (prof == profile) {
-                                continue
+            
+            ScrollView {
+                VStack {
+                    ForEach(profiles) { profile in
+                        HStack{
+                            //Label(profile.name, systemImage: profile.isSelected ? "checkmark.app" : "")
+                            Button {
+                                let code = profile.get2Auth6DigitCode()
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(code ?? "", forType: .string)
+                                // put recenently used profile at the top while normalizing accessCounts so usage details aren't stored on disk except that a profile may be used more than another profile
+                                // we don't want it so that "the person accessed this x amount of times and that y amount of times" is aparent on the db
+                                var i = 0
+                                for prof in profiles.reversed() {
+                                    if (prof == profile) {
+                                        continue
+                                    }
+                                    prof.accessCount = i
+                                    i += 1
+                                }
+                                profile.accessCount = i
+                            } label: {
+                                Image(systemName: "document.on.clipboard").imageScale(.small)
                             }
-                            prof.accessCount = i
-                            i += 1
-                        }
-                        profile.accessCount = i
-                    } label: {
-                        Image(systemName: "document.on.clipboard").imageScale(.small)
-                    }
-                    Text(profile.name)
-                    Button {
-                        // delete and normalize profile list
-                        var i = 0
-                        for prof in profiles.reversed() {
-                            if (prof == profile) {
-                                modelContext.delete(prof)
-                                continue
+                            Text(profile.name)
+                            Button {
+                                // delete and normalize profile list
+                                var i = 0
+                                for prof in profiles.reversed() {
+                                    if (prof == profile) {
+                                        modelContext.delete(prof)
+                                        continue
+                                    }
+                                    prof.accessCount = i
+                                    i += 1
+                                }
+                            } label: {
+                                Image(systemName: "trash").imageScale(.small)
                             }
-                            prof.accessCount = i
-                            i += 1
                         }
-                    } label: {
-                        Image(systemName: "trash").imageScale(.small)
                     }
                 }
-            }
+            }.scrollIndicators(.never)
+            
             /*Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")*/
-            Button("New Profile") {
-                showNewProfileView.toggle()
+            if !showNewProfileView {
+                Button("New Profile") {
+                    showNewProfileView = true
+                }
+            } else {
+                Button("Cancel New Profile") {
+                    scrnshotQrer.qrString = ""
+                    newProfileName = ""
+                    showNewProfileView = false
+                }
             }
+            
             if showNewProfileView {
                 TextField(text: $newProfileName, prompt: Text("New Profile Name")) {}
                 HStack {
