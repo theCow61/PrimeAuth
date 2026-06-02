@@ -24,6 +24,9 @@ struct ContentView: View {
             
             ScrollView {
                 VStack {
+                    if profiles.isEmpty {
+                        Color.clear.frame(width: 10, height: 10) // so its not empty after deleting the last profile. Avoids an exception
+                    }
                     ForEach(profiles) { profile in
                         HStack{
                             //Label(profile.name, systemImage: profile.isSelected ? "checkmark.app" : "")
